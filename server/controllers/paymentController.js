@@ -27,3 +27,13 @@ exports.confirmPayment = async (req, res) => {
         res.status(500).json({ message: 'Failed to confirm payment and send ticket' });
     }
 };
+
+
+
+// TODO LOCATION ,GENRE , LANGUAGE FILTER 
+// FIXME PAYMENT SERVICE 
+// TODO TICKET CANCELLATION 
+// FIXME MAIL PDF
+// TODO RESEND MAIL IF TICKET WAS CANCELLED
+
+
