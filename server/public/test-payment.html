@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Razorpay Test Payment</title>
+</head>
+<body>
+  <h2>🎬 Test Razorpay Payment</h2>
+  <button id="rzp-button">Pay ₹499</button>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    const orderId = "order_MkWxxxxx123"; // Replace with actual order_id from your backend
+
+    const options = {
+      key: "RAZORPAY_KEY_ID", // Replace with your Razorpay test key ID
+      amount: 49900,           // Amount in paisa
+      currency: "INR",
+      name: "Cinema Booking",
+      description: "Movie Ticket Booking",
+      order_id: orderId,       // This comes from your backend `/create-order` response
+
+      handler: function (response) {
+        alert("Payment successful!");
+        console.log("payment_id:", response.razorpay_payment_id);
+        console.log("order_id:", response.razorpay_order_id);
+        console.log("signature:", response.razorpay_signature);
+        
+        // Show paymentId to use in Postman
+        document.body.innerHTML += `<p><strong>Payment ID:</strong> ${response.razorpay_payment_id}</p>`;
+      },
+
+      prefill: {
+        name: "Test User",
+        email: "test@example.com"
+      },
+      theme: {
+        color: "#3399cc"
+      }
+    };
+
+    document.getElementById('rzp-button').onclick = function () {
+      const rzp = new Razorpay(options);
+      rzp.open();
+    };
+  </script>
+</body>
+</html>

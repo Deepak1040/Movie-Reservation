@@ -42,51 +42,121 @@ const { StatusCodes } = require('http-status-codes');
 // };
 
 
+// exports.confirmPayment = async (req, res) => {
+//     try {
+//         const { userId, showtimeId, seats, paymentId, orderId, status } = req.body;
+
+//         const user = await User.findById(userId);
+//         const showtime = await Showtime.findById(showtimeId)
+//             .populate('movie')
+//             .populate({ path: 'theater', populate: { path: 'cinema' } });
+//         if (!user || !showtime) {
+//             return res.status(404).json({ message: "User or Showtime not found" });
+//         }
+
+//         if (status === "failed") {
+//             // Payment failed - send cancellation email
+//             await sendCancellationEmail(user.email, showtime, seats);
+//             return res.status(StatusCodes.BAD_REQUEST).json({
+//                 success: false,
+//                 message: "Payment failed. Cancellation email sent."
+//             });
+//         }
+
+//         // Payment succeeded - generate ticket and send
+//         const bookingId = `BOOK-${Date.now()}`;
+//         const ticketPath = await generateTicketPDF({
+//             user,
+//             showtime,
+//             seats,
+//             bookingId,
+//         });
+
+//         await sendTicketEmail(user.email, ticketPath, bookingId, user.username, showtime);
+
+//         // Save to user model
+//         await User.findByIdAndUpdate(userId, {
+//             $push: { tickets: { showtime: showtime._id, seats } },
+//         });
+
+//         res.status(StatusCodes.OK).json({
+//             success: true,
+//             message: "Payment confirmed. Ticket sent via email."
+//         });
+//     } catch (err) {
+//         console.error("Error in confirmPayment:", err);
+//         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+//     }
+// };
+
+
+// const Razorpay = require("razorpay");
+// const generateTicketPDF = require("../utils/generateTicketPDF");
+// const sendTicketEmail = require("../utils/sendTicketEmail");
+// const sendCancellationEmail = require("../utils/sendCancellationEmail");
+// const User = require("../models/User");
+// const Showtime = require("../models/Showtime");
+
+// // Razorpay instance
+// const razorpay = new Razorpay({
+//   key_id: process.env.RAZORPAY_KEY_ID,
+//   key_secret: process.env.RAZORPAY_SECRET,
+// });
+
 exports.confirmPayment = async (req, res) => {
-    try {
-        const { userId, showtimeId, seats, paymentId, orderId, status } = req.body;
+  try {
+    const { userId, showtimeId, seats, paymentId } = req.body;
 
-        const user = await User.findById(userId);
-        const showtime = await Showtime.findById(showtimeId)
-            .populate('movie')
-            .populate({ path: 'theater', populate: { path: 'cinema' } });
-        if (!user || !showtime) {
-            return res.status(404).json({ message: "User or Showtime not found" });
-        }
-
-        if (status === "failed") {
-            // Payment failed - send cancellation email
-            await sendCancellationEmail(user.email, showtime, seats);
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                success: false,
-                message: "Payment failed. Cancellation email sent."
-            });
-        }
-
-        // Payment succeeded - generate ticket and send
-        const bookingId = `BOOK-${Date.now()}`;
-        const ticketPath = await generateTicketPDF({
-            user,
-            showtime,
-            seats,
-            bookingId,
-        });
-
-        await sendTicketEmail(user.email, ticketPath, bookingId, user.username, showtime);
-
-        // Save to user model
-        await User.findByIdAndUpdate(userId, {
-            $push: { tickets: { showtime: showtime._id, seats } },
-        });
-
-        res.status(StatusCodes.OK).json({
-            success: true,
-            message: "Payment confirmed. Ticket sent via email."
-        });
-    } catch (err) {
-        console.error("Error in confirmPayment:", err);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    if (!userId || !showtimeId || !Array.isArray(seats) || !paymentId) {
+      return res.status(400).json({ message: "Invalid input data" });
     }
+
+    const user = await User.findById(userId);
+    const showtime = await Showtime.findById(showtimeId)
+      .populate("movie")
+      .populate({
+        path: "theater",
+        populate: { path: "cinema" }
+      });
+
+    if (!user || !showtime) {
+      return res.status(404).json({ message: "User or showtime not found" });
+    }
+
+    // 🔍 Verify payment with Razorpay
+    const payment = await razorpay.payments.fetch(paymentId);
+
+    if (payment.status === "captured") {
+      const bookingId = `BOOK-${Date.now()}`;
+      const filePath = await generateTicketPDF({
+        user,
+        showtime,
+        seats,
+        bookingId,
+      });
+
+      await sendTicketEmail(user.email, filePath, bookingId, user.username, showtime);
+
+      // Optional: store ticket in user profile
+      await User.findByIdAndUpdate(userId, {
+        $push: { tickets: { showtime: showtime._id, seats } },
+      });
+
+      return res.status(200).json({ message: "🎫 Ticket sent successfully!" });
+    } else {
+      // ❌ Payment failed/cancelled
+      await sendCancellationEmail(user.email, showtime, seats);
+      return res.status(402).json({
+        message: "❌ Payment failed or not captured. Booking cancelled.",
+      });
+    }
+  } catch (err) {
+    console.error("Error in confirmPayment:", err);
+    res.status(500).json({
+      message: "Failed to confirm payment and send ticket",
+      error: err.message,
+    });
+  }
 };
 
 

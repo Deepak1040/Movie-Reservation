@@ -54,9 +54,8 @@ const ticketDir = path.join(__dirname, 'tickets');
 if (!fs.existsSync(ticketDir)) {
     fs.mkdirSync(ticketDir);
 }
-
-const paymentRoutes = require('./routes/payment');
-app.use('/payment', paymentRoutes);
+const payment = require('./routes/payment')
+app.use('/payment', payment);
 
 const port = process.env.PORT
 

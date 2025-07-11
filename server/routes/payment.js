@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth')
 const {
     confirmPayment,
     resendTicketEmail,
@@ -296,6 +297,6 @@ router.post('/ticket/cancel', cancelTicket);
  *                   type: string
  *                   example: Razorpay error message
  */
-router.post('/create-order', createOrder);
+router.post('/create-order',createOrder);
 
 module.exports = router;
