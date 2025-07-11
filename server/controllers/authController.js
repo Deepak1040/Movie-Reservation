@@ -1,3 +1,4 @@
+const { StatusCodes } = require('http-status-codes')
 const User = require('../models/User')
 
 //@desc    Register user
@@ -72,9 +73,12 @@ exports.register = async (req, res, next) => {
 			role
 		})
 
-		sendTokenResponse(user, 200, res)
+		sendTokenResponse(user, StatusCodes.OK, res)
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -142,26 +146,29 @@ exports.login = async (req, res, next) => {
 
 		//Validate email & password
 		if (!username || !password) {
-			return res.status(400).json('Please provide an username and password')
+			return res.status(StatusCodes.BAD_REQUEST).json('Please provide an username and password')
 		}
 
 		//Check for user
 		const user = await User.findOne({ username }).select('+password')
 
 		if (!user) {
-			return res.status(400).json('Invalid credentials')
+			return res.status(StatusCodes.BAD_REQUEST).json('Invalid credentials')
 		}
 
 		//Check if password matches
 		const isMatch = await user.matchPassword(password)
 
 		if (!isMatch) {
-			return res.status(401).json('Invalid credentials')
+			return res.status(StatusCodes.UNAUTHORIZED).json('Invalid credentials')
 		}
 
-		sendTokenResponse(user, 200, res)
+		sendTokenResponse(user, StatusCodes.OK, res)
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -284,12 +291,15 @@ const sendTokenResponse = (user, statusCode, res) => {
 exports.getMe = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id)
-		res.status(200).json({
+		res.status(StatusCodes.OK).json({
 			success: true,
 			data: user
 		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -393,15 +403,18 @@ exports.getTickets = async (req, res, next) => {
 					select: 'cinema number'
 				}
 			],
-			select: '_id theater movie showtime isRelease' // ✅ Add _id here
+			select: '_id theater movie showtime isRelease'
 		});
 
-		res.status(200).json({
+		res.status(StatusCodes.OK).json({
 			success: true,
 			data: user
 		});
 	} catch (err) {
-		res.status(400).json({ success: false, message: err });
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 };
 
@@ -452,11 +465,14 @@ exports.logout = async (req, res, next) => {
 			httpOnly: true
 		})
 
-		res.status(200).json({
+		res.status(StatusCodes.OK).json({
 			success: true
 		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -552,12 +568,15 @@ exports.getAll = async (req, res, next) => {
 			select: 'theater movie showtime isRelease'
 		})
 
-		res.status(200).json({
+		res.status(StatusCodes.OK).json({
 			success: true,
 			data: user
 		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -614,11 +633,14 @@ exports.deleteUser = async (req, res, next) => {
 		const user = await User.findByIdAndDelete(req.params.id)
 
 		if (!user) {
-			return res.status(400).json({ success: false })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false })
 		}
-		res.status(200).json({ success: true })
+		res.status(StatusCodes.OK).json({ success: true })
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -695,10 +717,19 @@ exports.updateUser = async (req, res, next) => {
 		})
 
 		if (!user) {
-			return res.status(400).json({ success: false, message: `User not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				success: false,
+				message: `User not found with id of ${req.params.id}`
+			});
 		}
-		res.status(200).json({ success: true, data: user })
+		res.status(StatusCodes.OK).json({
+			success: true,
+			data: user
+		});
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }

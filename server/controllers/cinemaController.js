@@ -1,3 +1,4 @@
+const { StatusCodes } = require('http-status-codes');
 const Cinema = require('../models/Cinema');
 
 //@desc     GET all cinemas
@@ -108,9 +109,16 @@ exports.getCinemas = async (req, res, next) => {
 				return cinemas
 			})
 
-		res.status(200).json({ success: true, count: cinemas.length, data: cinemas })
+		res.status(StatusCodes.OK).json({
+			success: true,
+			count: cinemas.length,
+			data: cinemas
+		});
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -214,9 +222,16 @@ exports.getUnreleasedCinemas = async (req, res, next) => {
 			.collation({ locale: 'en', strength: 2 })
 			.sort({ name: 1 })
 
-		res.status(200).json({ success: true, count: cinemas.length, data: cinemas })
+		res.status(StatusCodes.OK).json({
+			success: true,
+			count: cinemas.length,
+			data: cinemas
+		});
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -331,12 +346,21 @@ exports.getCinema = async (req, res, next) => {
 			})
 
 		if (!cinema) {
-			return res.status(400).json({ success: false, message: `Cinema not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				success: false,
+				message: `Cinema not found with id of ${req.params.id}`
+			});
 		}
 
-		res.status(200).json({ success: true, data: cinema })
+		res.status(StatusCodes.OK).json({
+			success: true,
+			data: cinema
+		});
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -408,12 +432,15 @@ exports.getCinema = async (req, res, next) => {
 exports.createCinema = async (req, res, next) => {
 	try {
 		const cinema = await Cinema.create(req.body)
-		res.status(201).json({
+		res.status(StatusCodes.CREATED).json({
 			success: true,
 			data: cinema
 		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 
@@ -496,11 +523,20 @@ exports.updateCinema = async (req, res, next) => {
 		})
 
 		if (!cinema) {
-			return res.status(400).json({ success: false, message: `Cinema not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				success: false,
+				message: `Cinema not found with id of ${req.params.id}`
+			});
 		}
-		res.status(200).json({ success: true, data: cinema })
+		res.status(StatusCodes.OK).json({
+			success: true,
+			data: cinema
+		});
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		})
 	}
 }
 
@@ -555,15 +591,24 @@ exports.deleteCinema = async (req, res, next) => {
 		const cinema = await Cinema.findById(req.params.id)
 
 		if (!cinema) {
-			return res.status(400).json({ success: false, message: `Cinema not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				success: false,
+				message: `Cinema not found with id of ${req.params.id}`
+			});
 		}
 
 		await cinema.deleteOne()
 
-		res.status(200).json({ success: true })
+		res.status(StatusCodes.OK).json({
+			success: true,
+			message: "Cinema Deleted"
+		});
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({
+			success: false,
+			message: err
+		});
 	}
 }
 

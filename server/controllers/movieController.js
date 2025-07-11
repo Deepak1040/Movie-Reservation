@@ -1,3 +1,4 @@
+const { StatusCodes } = require('http-status-codes')
 const Movie = require('../models/Movie')
 const Showtime = require('../models/Showtime')
 
@@ -79,9 +80,16 @@ const Showtime = require('../models/Showtime')
 exports.getMovies = async (req, res, next) => {
 	try {
 		const movies = await Movie.find().sort({ createdAt: -1 })
-		res.status(200).json({ success: true, count: movies.length, data: movies })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			count: movies.length, 
+			data: movies 
+		});
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		});
 	}
 }
 
@@ -181,10 +189,16 @@ exports.getShowingMovies = async (req, res, next) => {
 			}
 		])
 
-		res.status(200).json({ success: true, data: showingShowtime })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: showingShowtime 
+		});
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -279,10 +293,16 @@ exports.getUnreleasedShowingMovies = async (req, res, next) => {
 			}
 		])
 
-		res.status(200).json({ success: true, data: showingShowtime })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: showingShowtime 
+		})
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -362,12 +382,21 @@ exports.getMovie = async (req, res, next) => {
 		const movie = await Movie.findById(req.params.id)
 
 		if (!movie) {
-			return res.status(400).json({ success: false, message: `Movie not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Movie not found with id of ${req.params.id}` 
+			})
 		}
 
-		res.status(200).json({ success: true, data: movie })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: movie 
+		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -476,12 +505,15 @@ exports.getMovie = async (req, res, next) => {
 exports.createMovie = async (req, res, next) => {
 	try {
 		const movie = await Movie.create(req.body)
-		res.status(201).json({
+		res.status(StatusCodes.CREATED).json({
 			success: true,
 			data: movie
 		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -570,11 +602,20 @@ exports.updateMovie = async (req, res, next) => {
 		})
 
 		if (!movie) {
-			return res.status(400).json({ success: false, message: `Movie not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Movie not found with id of ${req.params.id}` 
+			})
 		}
-		res.status(200).json({ success: true, data: movie })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: movie 
+		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -625,12 +666,17 @@ exports.deleteMovie = async (req, res, next) => {
 		const movie = await Movie.findById(req.params.id)
 
 		if (!movie) {
-			return res.status(400).json({ success: false, message: `Movie not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Movie not found with id of ${req.params.id}` })
 		}
 
 		await movie.deleteOne()
-		res.status(200).json({ success: true })
+		res.status(StatusCodes.OK).json({ success: true })
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }

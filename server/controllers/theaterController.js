@@ -1,3 +1,4 @@
+const { StatusCodes } = require('http-status-codes')
 const Cinema = require('../models/Cinema')
 const Theater = require('../models/Theater')
 
@@ -95,9 +96,16 @@ exports.getTheaters = async (req, res, next) => {
 				return theaters
 			})
 
-		res.status(200).json({ success: true, count: theaters.length, data: theaters })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			count: theaters.length, 
+			data: theaters 
+		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -196,12 +204,18 @@ exports.getTheater = async (req, res, next) => {
 			})
 
 		if (!theater) {
-			return res.status(400).json({ success: false, message: `Theater not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Theater not found with id of ${req.params.id}` 
+			})
 		}
 
-		res.status(200).json({ success: true, data: theater })
+		res.status(StatusCodes.OK).json({ success: true, data: theater })
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err }
+		)
 	}
 }
 
@@ -295,12 +309,21 @@ exports.getUnreleasedTheater = async (req, res, next) => {
 		])
 
 		if (!theater) {
-			return res.status(400).json({ success: false, message: `Theater not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Theater not found with id of ${req.params.id}` 
+			})
 		}
 
-		res.status(200).json({ success: true, data: theater })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: theater 
+		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -442,10 +465,16 @@ exports.getTheaterByMovie = async (req, res, next) => {
 				)
 			})
 		})
-		res.status(200).json({ success: true, data: theaters })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: theaters 
+		})
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -579,10 +608,16 @@ exports.getUnreleasedTheaterByMovie = async (req, res, next) => {
 				)
 			})
 		})
-		res.status(200).json({ success: true, data: theaters })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: theaters 
+		})
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -667,17 +702,26 @@ exports.createTheater = async (req, res, next) => {
 		const { cinema: cinemaId, row, column } = req.body
 		const rowRegex = /^([A-D][A-Z]|[A-Z])$/
 		if (!rowRegex.test(row)) {
-			return res.status(400).json({ success: false, message: `Row is not a valid letter between A to CZ` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Row is not a valid letter between A to CZ` 
+			})
 		}
 
 		if (column < 1 || column > 120) {
-			return res.status(400).json({ success: false, message: `Column is not a valid number between 1 to 250` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Column is not a valid number between 1 to 250` 
+			})
 		}
 
 		const cinema = await Cinema.findById(cinemaId)
 
 		if (!cinema) {
-			return res.status(400).json({ success: false, message: `Cinema not found with id of ${cinemaId}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Cinema not found with id of ${cinemaId}` 
+			})
 		}
 
 		const theater = await Theater.create({ cinema, number: cinema.theaters.length + 1, seatPlan: { row, column } })
@@ -686,12 +730,14 @@ exports.createTheater = async (req, res, next) => {
 
 		await cinema.save()
 
-		res.status(201).json({
+		res.status(StatusCodes.CREATED).json({
 			success: true,
 			data: theater
 		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err })
 	}
 }
 
@@ -783,11 +829,20 @@ exports.updateTheater = async (req, res, next) => {
 		})
 
 		if (!theater) {
-			return res.status(400).json({ success: false, message: `Theater not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Theater not found with id of ${req.params.id}` 
+			})
 		}
-		res.status(200).json({ success: true, data: theater })
+		res.status(StatusCodes.OK).json({ 
+			success: true, 
+			data: theater 
+		})
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }
 
@@ -838,15 +893,21 @@ exports.deleteTheater = async (req, res, next) => {
 		const theater = await Theater.findById(req.params.id)
 
 		if (!theater) {
-			return res.status(400).json({ success: false, message: `Theater not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ 
+				success: false, 
+				message: `Theater not found with id of ${req.params.id}` 
+			})
 		}
 
 		await theater.deleteOne()
 
 		await Cinema.updateMany({ theaters: theater._id }, { $pull: { theaters: theater._id } })
 
-		res.status(200).json({ success: true })
+		res.status(StatusCodes.OK).json({ success: true })
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ 
+			success: false, 
+			message: err 
+		})
 	}
 }

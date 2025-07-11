@@ -1,3 +1,4 @@
+const { StatusCodes } = require('http-status-codes')
 const Movie = require('../models/Movie')
 const Showtime = require('../models/Showtime')
 const Theater = require('../models/Theater')
@@ -13,7 +14,7 @@ const User = require('../models/User')
  *     summary: Get all released showtimes
  *     tags: [Showtime]
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Successfully retrieved all showtimes with isRelease: true"
  *         content:
  *           application/json:
@@ -60,7 +61,7 @@ const User = require('../models/User')
  *                               name:
  *                                 type: string
  *                                 example: "PVR Cinemas"
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Error fetching showtimes"
  *         content:
  *           application/json:
@@ -83,10 +84,10 @@ exports.getShowtimes = async (req, res, next) => {
 			])
 			.select('-seats.user -seats.row -seats.number')
 
-		res.status(200).json({ success: true, count: showtimes.length, data: showtimes })
+		res.status(StatusCodes.OK).json({ success: true, count: showtimes.length, data: showtimes })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 //@desc     GET showtimes with all unreleased showtime
@@ -99,7 +100,7 @@ exports.getShowtimes = async (req, res, next) => {
  *     summary: Get all showtimes including unreleased ones (admin view)
  *     tags: [Showtime]
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Successfully retrieved all showtimes, regardless of isRelease status"
  *         content:
  *           application/json:
@@ -146,7 +147,7 @@ exports.getShowtimes = async (req, res, next) => {
  *                               name:
  *                                 type: string
  *                                 example: "INOX"
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Error retrieving showtimes"
  *         content:
  *           application/json:
@@ -169,10 +170,10 @@ exports.getUnreleasedShowtimes = async (req, res, next) => {
 			])
 			.select('-seats.user -seats.row -seats.number')
 
-		res.status(200).json({ success: true, count: showtimes.length, data: showtimes })
+		res.status(StatusCodes.OK).json({ success: true, count: showtimes.length, data: showtimes })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -194,7 +195,7 @@ exports.getUnreleasedShowtimes = async (req, res, next) => {
  *           type: string
  *           example: 64f3cb2fe01e0d6ad89fa233
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Successfully retrieved the released showtime"
  *         content:
  *           application/json:
@@ -240,7 +241,7 @@ exports.getUnreleasedShowtimes = async (req, res, next) => {
  *                             name:
  *                               type: string
  *                               example: "PVR Orion Mall"
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Showtime not found or not released"
  *         content:
  *           application/json:
@@ -264,17 +265,17 @@ exports.getShowtime = async (req, res, next) => {
 			.select('-seats.user')
 
 		if (!showtime) {
-			return res.status(400).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
 		}
 
 		if (!showtime.isRelease) {
-			return res.status(400).json({ success: false, message: `Showtime is not released` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Showtime is not released` })
 		}
 
-		res.status(200).json({ success: true, data: showtime })
+		res.status(StatusCodes.OK).json({ success: true, data: showtime })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -296,7 +297,7 @@ exports.getShowtime = async (req, res, next) => {
  *           type: string
  *           example: 64f3cb2fe01e0d6ad89fa233
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Showtime with populated seat user info retrieved successfully"
  *         content:
  *           application/json:
@@ -356,7 +357,7 @@ exports.getShowtime = async (req, res, next) => {
  *                               role:
  *                                 type: string
  *                                 example: "user"
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Showtime not found or error during retrieval"
  *         content:
  *           application/json:
@@ -379,13 +380,13 @@ exports.getShowtimeWithUser = async (req, res, next) => {
 		])
 
 		if (!showtime) {
-			return res.status(400).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
 		}
 
-		res.status(200).json({ success: true, data: showtime })
+		res.status(StatusCodes.OK).json({ success: true, data: showtime })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -431,7 +432,7 @@ exports.getShowtimeWithUser = async (req, res, next) => {
  *                 description: Whether the showtime is publicly released
  *                 example: true
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Showtime(s) created successfully"
  *         content:
  *           application/json:
@@ -447,7 +448,7 @@ exports.getShowtimeWithUser = async (req, res, next) => {
  *                     type: string
  *                     format: date-time
  *                     example: "2025-07-15T18:30:00.000Z"
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Error in input or validation failure"
  *         content:
  *           application/json:
@@ -466,7 +467,7 @@ exports.addShowtime = async (req, res, next) => {
 		const { movie: movieId, showtime: showtimeString, theater: theaterId, repeat = 1, isRelease } = req.body
 
 		if (repeat > 31 || repeat < 1) {
-			return res.status(400).json({ success: false, message: `Repeat is not a valid number between 1 to 31` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Repeat is not a valid number between 1 to 31` })
 		}
 
 		let showtime = new Date(showtimeString)
@@ -476,13 +477,13 @@ exports.addShowtime = async (req, res, next) => {
 		const theater = await Theater.findById(theaterId)
 
 		if (!theater) {
-			return res.status(400).json({ success: false, message: `Theater not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Theater not found with id of ${req.params.id}` })
 		}
 
 		const movie = await Movie.findById(movieId)
 
 		if (!movie) {
-			return res.status(400).json({ success: false, message: `Movie not found with id of ${movieId}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Movie not found with id of ${movieId}` })
 		}
 
 		for (let i = 0; i < repeat; i++) {
@@ -496,13 +497,13 @@ exports.addShowtime = async (req, res, next) => {
 
 		await theater.save()
 
-		res.status(200).json({
+		res.status(StatusCodes.OK).json({
 			success: true,
 			showtimes: showtimes
 		})
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -541,7 +542,7 @@ exports.addShowtime = async (req, res, next) => {
  *                   type: string
  *                 example: ["A1", "A2", "B3"]
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Seats successfully purchased"
  *         content:
  *           application/json:
@@ -557,7 +558,7 @@ exports.addShowtime = async (req, res, next) => {
  *                 updatedUser:
  *                   type: object
  *                   description: Updated user document with ticket info
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Invalid seat or showtime not found"
  *         content:
  *           application/json:
@@ -579,7 +580,7 @@ exports.purchase = async (req, res, next) => {
 		const showtime = await Showtime.findById(req.params.id).populate({ path: 'theater', select: 'seatPlan' })
 
 		if (!showtime) {
-			return res.status(400).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
 		}
 
 		const isSeatValid = seats.every((seatNumber) => {
@@ -595,7 +596,7 @@ exports.purchase = async (req, res, next) => {
 		})
 
 		if (!isSeatValid) {
-			return res.status(400).json({ success: false, message: 'Seat is not valid' })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Seat is not valid' })
 		}
 
 		const isSeatAvailable = seats.every((seatNumber) => {
@@ -604,7 +605,7 @@ exports.purchase = async (req, res, next) => {
 		})
 
 		if (!isSeatAvailable) {
-			return res.status(400).json({ success: false, message: 'Seat not available' })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: 'Seat not available' })
 		}
 
 		const seatUpdates = seats.map((seatNumber) => {
@@ -623,10 +624,10 @@ exports.purchase = async (req, res, next) => {
 			{ new: true }
 		)
 
-		res.status(200).json({ success: true, data: updatedShowtime, updatedUser })
+		res.status(StatusCodes.OK).json({ success: true, data: updatedShowtime, updatedUser })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -668,7 +669,7 @@ exports.purchase = async (req, res, next) => {
  *                 type: string
  *                 example: "64f3cb2fe01e0d6ad89fa288"
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Showtime updated successfully"
  *         content:
  *           application/json:
@@ -680,7 +681,7 @@ exports.purchase = async (req, res, next) => {
  *                   example: true
  *                 data:
  *                   $ref: '#/components/schemas/Showtime'
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Invalid input or showtime not found"
  *         content:
  *           application/json:
@@ -702,11 +703,11 @@ exports.updateShowtime = async (req, res, next) => {
 		})
 
 		if (!showtime) {
-			return res.status(400).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
 		}
-		res.status(200).json({ success: true, data: showtime })
+		res.status(StatusCodes.OK).json({ success: true, data: showtime })
 	} catch (err) {
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -728,7 +729,7 @@ exports.updateShowtime = async (req, res, next) => {
  *           type: string
  *           example: "64f3cb2fe01e0d6ad89fa233"
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Showtime deleted successfully"
  *         content:
  *           application/json:
@@ -738,7 +739,7 @@ exports.updateShowtime = async (req, res, next) => {
  *                 success:
  *                   type: boolean
  *                   example: true
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Showtime not found or deletion failed"
  *         content:
  *           application/json:
@@ -757,15 +758,15 @@ exports.deleteShowtime = async (req, res, next) => {
 		const showtime = await Showtime.findById(req.params.id)
 
 		if (!showtime) {
-			return res.status(400).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
+			return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: `Showtime not found with id of ${req.params.id}` })
 		}
 
 		await showtime.deleteOne()
 
-		res.status(200).json({ success: true })
+		res.status(StatusCodes.OK).json({ success: true })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -792,7 +793,7 @@ exports.deleteShowtime = async (req, res, next) => {
  *                   type: string
  *                 example: ["64f3cb2fe01e0d6ad89fa233", "64f3cb2fe01e0d6ad89fa244"]
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Showtimes deleted successfully"
  *         content:
  *           application/json:
@@ -805,7 +806,7 @@ exports.deleteShowtime = async (req, res, next) => {
  *                 count:
  *                   type: integer
  *                   example: 2
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Error occurred during deletion"
  *         content:
  *           application/json:
@@ -837,10 +838,10 @@ exports.deleteShowtimes = async (req, res, next) => {
 			await showtimeId.deleteOne()
 		}
 
-		res.status(200).json({ success: true, count: showtimesIds.length })
+		res.status(StatusCodes.OK).json({ success: true, count: showtimesIds.length })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
 
@@ -854,7 +855,7 @@ exports.deleteShowtimes = async (req, res, next) => {
  *     summary: Delete all past showtimes (before today)
  *     tags: [Showtime]
  *     responses:
- *       200:
+ *       StatusCodes.OK:
  *         description: "Expired showtimes deleted successfully"
  *         content:
  *           application/json:
@@ -868,7 +869,7 @@ exports.deleteShowtimes = async (req, res, next) => {
  *                   type: integer
  *                   description: Number of deleted showtimes
  *                   example: 12
- *       400:
+ *       StatusCodes.BAD_REQUEST:
  *         description: "Error during deletion"
  *         content:
  *           application/json:
@@ -893,9 +894,9 @@ exports.deletePreviousShowtime = async (req, res, next) => {
 			await showtimeId.deleteOne()
 		}
 
-		res.status(200).json({ success: true, count: showtimesIds.length })
+		res.status(StatusCodes.OK).json({ success: true, count: showtimesIds.length })
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({ success: false, message: err })
+		res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err })
 	}
 }
