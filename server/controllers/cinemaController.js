@@ -613,3 +613,8 @@ exports.deleteCinema = async (req, res, next) => {
 }
 
 
+
+function apple(){
+	return 'apple';
+}
+
