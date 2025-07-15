@@ -11,8 +11,11 @@ const router = express.Router()
 
 const { protect, authorize } = require('../middleware/auth')
 
-router.route('/').get(getCinemas).post(protect, authorize('admin'), createCinema)
-router.route('/unreleased').get(protect, authorize('admin'), getUnreleasedCinemas)
+router.route('/')
+	.get(getCinemas)
+	.post(protect, authorize('admin'), createCinema)
+router.route('/unreleased')
+	.get(protect, authorize('admin'), getUnreleasedCinemas)
 router
 	.route('/:id')
 	.get(getCinema)

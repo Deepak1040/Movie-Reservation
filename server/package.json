@@ -36,5 +36,8 @@
     "xss-clean": "^0.1.4"
   },
   "type": "commonjs",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "jest": "^30.0.4"
+  }
 }
